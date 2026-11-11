@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Allenamento Dattilografia</title>
+<style>
+  :root{
+    --bg:#f3f6fb; --card:#ffffff; --ink:#1f2a44; --muted:#5c6b8a; --line:#dde4f0;
+    --brand:#3b6cf6; --brand-d:#2a54cf; --ok:#1f9d55; --bad:#d64545; --warn:#e69b1e;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+  header{background:linear-gradient(135deg,#3b6cf6,#6a4df0);color:#fff;padding:22px 16px;text-align:center}
+  header h1{margin:0;font-size:1.7rem}
+  header p{margin:6px 0 0;opacity:.92}
+  main{max-width:960px;margin:0 auto;padding:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 2px 6px rgba(31,42,68,.05)}
+  .card h2{margin:0 0 12px;font-size:1.2rem}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .field{flex:1 1 180px;display:flex;flex-direction:column}
+  label{font-weight:600;font-size:.9rem;margin-bottom:4px}
+  input[type=text]{padding:10px 12px;border:2px solid var(--line);border-radius:10px;font-size:1rem}
+  input[type=text]:focus{outline:none;border-color:var(--brand)}
+  input[type=text]:disabled{background:#eef1f7}
+  button{font-size:1rem;font-weight:700;border:none;border-radius:10px;padding:11px 20px;cursor:pointer;transition:.15s}
+  .primary{background:var(--brand);color:#fff}
+  .primary:hover:not(:disabled){background:var(--brand-d)}
+  .secondary{background:#e8edf8;color:var(--ink)}
+  .secondary:hover:not(:disabled){background:#d9e1f3}
+  .success{background:var(--ok);color:#fff}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  .msg{color:var(--bad);font-size:.9rem;margin-top:8px;min-height:1.2em}
+  details summary{cursor:pointer;font-weight:700;font-size:1.2rem}
+  .tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-top:14px}
+  .tip{background:#f6f8fd;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .tip b{display:block;margin-bottom:4px}
+  .tip ul{margin:0;padding-left:18px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px}
+  .stat{background:#f6f8fd;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+  .stat span{display:block;font-size:.8rem;color:var(--muted)}
+  .stat strong{font-size:1.6rem}
+  #timer{color:var(--brand)}
+  #timer.low{color:var(--bad)}
+  .bar{height:10px;background:#e6ebf5;border-radius:99px;overflow:hidden;margin-bottom:12px}
+  .bar div{height:100%;width:100%;background:var(--brand);transition:width .25s linear}
+  #textbox{position:relative;height:190px;overflow:hidden;background:#fbfcff;border:2px solid var(--line);border-radius:12px;padding:12px 16px;font-size:1.65rem;line-height:2;font-family:Consolas,"Courier New",monospace;user-select:none}
+  #textbox.active{border-color:var(--brand)}
+  #textbox span{color:#8b97b3}
+  #textbox span.ok{color:var(--ok)}
+  #textbox span.bad{color:var(--warn);text-decoration:underline}
+  #textbox span.cur{background:#cfdcff;color:var(--ink);border-radius:4px;box-shadow:0 2px 0 var(--brand)}
+  #textbox span.cur.err{background:#ffd3d3;animation:shake .2s}
+  @keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+  #overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;background:rgba(255,255,255,.88);font-family:"Segoe UI",system-ui,sans-serif;font-size:1.1rem;color:var(--muted);padding:20px}
+  #overlay.hidden{display:none}
+  .kbwrap{margin-top:14px;display:flex;flex-direction:column;align-items:center;gap:5px}
+  .kbrow{display:flex;gap:5px;justify-content:center}
+  .key{min-width:38px;height:38px;border-radius:8px;border:1px solid #c5cee2;background:#fff;display:flex;align-items:center;justify-content:center;font-size:.95rem;font-weight:600;color:#3a4766}
+  .key.wide{min-width:60px}
+  .key.space{min-width:300px}
+  .key.f1{background:#ffe3e3}.key.f2{background:#ffeccc}.key.f3{background:#fff7bf}.key.f4{background:#d9f5d6}
+  .key.f5{background:#d6f1f5}.key.f6{background:#dbe5ff}.key.f7{background:#ecdcff}.key.f8{background:#ffdcf0}
+  .key.hl{background:var(--brand);color:#fff;border-color:var(--brand-d);transform:translateY(2px);box-shadow:0 0 0 3px rgba(59,108,246,.3)}
+  .home::after{content:"";position:absolute}
+  .kbnote{font-size:.85rem;color:var(--muted);margin-top:6px;text-align:center}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 12px;justify-content:center;font-size:.78rem;color:var(--muted);margin-top:4px}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-2px;border:1px solid #c5cee2}
+  .toggle{display:flex;align-items:center;gap:6px;font-size:.9rem;color:var(--muted);margin-left:auto}
+  #result{display:none}
+  .level{font-size:1.2rem;font-weight:800;color:var(--brand)}
+  footer{text-align:center;color:var(--muted);font-size:.85rem;padding:10px 16px 28px}
+  @media (max-width:640px){
+    #textbox{font-size:1.25rem;height:170px}
+    .key{min-width:24px;height:30px;font-size:.75rem}
+    .key.wide{min-width:40px}.key.space{min-width:160px}
+    .kbrow{gap:3px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>⌨️ Allenamento Dattilografia</h1>
+  <p>Impara a scrivere veloce con la tastiera: 5 minuti di esercizio!</p>
+</header>
+
+<main>
+
+  <section class="card">
+    <h2>1. I tuoi dati</h2>
+    <div class="row">
+      <div class="field"><label for="nome">Nome</label><input type="text" id="nome" autocomplete="off" placeholder="es. Giulia"></div>
+      <div class="field"><label for="cognome">Cognome</label><input type="text" id="cognome" autocomplete="off" placeholder="es. Rossi"></div>
+      <div class="field"><label for="classe">Classe</label><input type="text" id="classe" autocomplete="off" placeholder="es. 2B"></div>
+    </div>
+    <div class="msg" id="msg"></div>
+  </section>
+
+  <section class="card">
+    <details open>
+      <summary>2. Istruzioni</summary>
+      <div class="tips">
+        <div class="tip"><b>🪑 Postura</b>
+          <ul><li>Schiena dritta, piedi appoggiati a terra.</li><li>Polsi rilassati, gomiti vicino al corpo.</li><li>Schermo davanti a te, all'altezza degli occhi.</li></ul></div>
+        <div class="tip"><b>🖐️ Posizione delle dita</b>
+          <ul><li>Mano sinistra su <b style="display:inline">A S D F</b>.</li><li>Mano destra su <b style="display:inline">J K L ò</b>.</li><li>I pollici stanno sulla barra spaziatrice.</li><li>Dopo ogni tasto, le dita tornano a casa.</li></ul></div>
+        <div class="tip"><b>👀 Non guardare la tastiera</b>
+          <ul><li>Tieni gli occhi sul testo.</li><li>Se non sai dov'è un tasto, guardalo nella tastiera colorata qui sotto.</li><li>Ogni dito ha il suo colore.</li></ul></div>
+        <div class="tip"><b>🎯 Prima la precisione</b>
+          <ul><li>Scrivi con calma e senza errori: la velocità arriva dopo.</li><li>Se sbagli, il cursore resta fermo: premi il tasto giusto.</li><li>Maiuscole: tieni premuto Shift con il mignolo opposto.</li></ul></div>
+        <div class="tip"><b>⏱️ Come funziona</b>
+          <ul><li>Scrivi nome, cognome e classe.</li><li>Premi <b style="display:inline">Inizia</b>: parte il timer di 5 minuti.</li><li>Copia il testo, lettera per lettera.</li><li>Alla fine scarica il tuo report e consegnalo.</li></ul></div>
+        <div class="tip"><b>💡 Consigli</b>
+          <ul><li>Mantieni un ritmo costante.</li><li>Non guardare le dita e non avere fretta.</li><li>Ripeti l'esercizio ogni giorno: bastano 5 minuti!</li></ul></div>
+      </div>
+    </details>
+  </section>
+
+  <section class="card">
+    <h2>3. Esercizio</h2>
+    <div class="stats">
+      <div class="stat"><span>Tempo rimasto</span><strong id="timer">5:00</strong></div>
+      <div class="stat"><span>Parole al minuto</span><strong id="wpm">0</strong></div>
+      <div class="stat"><span>Precisione</span><strong id="acc">100%</strong></div>
+      <div class="stat"><span>Errori</span><strong id="errs">0</strong></div>
+    </div>
+    <div class="bar"><div id="bar"></div></div>
+
+    <div id="textbox">
+      <div id="overlay">Compila nome, cognome e classe, poi premi <b>&nbsp;Inizia&nbsp;</b> per cominciare.</div>
+    </div>
+
+    <div class="kbwrap" id="kb" aria-hidden="true"></div>
+    <div class="legend" id="legend"></div>
+
+    <div class="actions">
+      <button class="primary" id="btnStart">▶ Inizia</button>
+      <button class="secondary" id="btnStop" disabled>■ Termina ora</button>
+      <label class="toggle"><input type="checkbox" id="chkKb" checked> Mostra tastiera guida</label>
+    </div>
+  </section>
+
+  <section class="card" id="result">
+    <h2>🎉 Risultato</h2>
+    <p id="resName" style="margin-top:0"></p>
+    <div class="stats">
+      <div class="stat"><span>Parole al minuto</span><strong id="rWpm">0</strong></div>
+      <div class="stat"><span>Precisione</span><strong id="rAcc">0%</strong></div>
+      <div class="stat"><span>Caratteri corretti</span><strong id="rChars">0</strong></div>
+      <div class="stat"><span>Errori</span><strong id="rErr">0</strong></div>
+    </div>
+    <p>Livello: <span class="level" id="rLevel"></span></p>
+    <p id="rAdvice"></p>
+    <div class="actions">
+      <button class="success" id="btnReport">⬇ Scarica il report</button>
+      <button class="secondary" id="btnAgain">↻ Riprova</button>
+    </div>
+  </section>
+
+</main>
+<footer>Allenati un po' ogni giorno: i progressi arrivano presto!</footer>
+
+<script>
+(function(){
+  const DURATION = 300; // secondi (5 minuti)
+
+  const PASSAGES = [
+    "La tastiera è uno strumento molto utile: imparare a usarla bene ci fa risparmiare tempo nello studio e nei compiti. All'inizio si va piano, poi con l'allenamento le dita imparano da sole dove andare.",
+    "Il mare d'inverno ha un fascino speciale. Le onde arrivano lente sulla spiaggia vuota e il vento porta il profumo del sale. Passeggiare lì, con una sciarpa al collo, è un ottimo modo per pensare.",
+    "Ogni mattina Marco prende lo zaino, saluta i genitori ed esce di casa. Lungo la strada incontra i suoi amici e insieme camminano verso la scuola, parlando della partita di calcio del giorno prima.",
+    "Le api sono insetti straordinari. Vivono in grandi famiglie, costruiscono case di cera e producono il miele. Senza di loro molti fiori e molti frutti non potrebbero crescere: per questo dobbiamo proteggerle.",
+    "Imparare a scrivere velocemente non significa correre senza guardare. Bisogna tenere la schiena dritta, i polsi rilassati e gli occhi sullo schermo. La precisione viene prima della velocità: chi sbaglia poco, poi diventa veloce.",
+    "In montagna l'aria è fresca e il silenzio è completo. Salendo lungo il sentiero si vedono cervi, scoiattoli e tanti fiori colorati. Quando si arriva in cima, la fatica scompare e resta solo la meraviglia del panorama.",
+    "Il computer ci aiuta a cercare informazioni, scrivere relazioni e creare presentazioni. Però è importante usarlo con attenzione, controllare le fonti e prendersi delle pause per riposare gli occhi e muoversi un po'.",
+    "Nel laboratorio di scienze abbiamo osservato una goccia d'acqua al microscopio. Dentro quella piccola goccia si muovevano tantissimi esseri viventi. La professoressa ci ha spiegato che il mondo è pieno di cose che non vediamo."
+  ];
+
+  // ---------- Tastiera guida (layout italiano) ----------
+  const ROWS = [
+    ["'","1","2","3","4","5","6","7","8","9","0","'","ì"],
+    ["q","w","e","r","t","y","u","i","o","p","è","+"],
+    ["a","s","d","f","g","h","j","k","l","ò","à","ù"],
+    ["z","x","c","v","b","n","m",",",".","-"]
+  ];
+  // Rimuovo il primo "'" della riga numeri (era un segnaposto) e uso il layout corretto
+  ROWS[0] = ["1","2","3","4","5","6","7","8","9","0","'","ì"];
+  const FINGER = {
+    "1":1,"q":1,"a":1,"z":1,
+    "2":2,"w":2,"s":2,"x":2,
+    "3":3,"e":3,"d":3,"c":3,
+    "4":4,"5":4,"r":4,"t":4,"f":4,"g":4,"v":4,"b":4,
+    "6":5,"7":5,"y":5,"u":5,"h":5,"j":5,"n":5,"m":5,
+    "8":6,"i":6,"k":6,",":6,
+    "9":7,"o":7,"l":7,".":7,
+    "0":8,"'":8,"ì":8,"p":8,"è":8,"+":8,"ò":8,"à":8,"ù":8,"-":8
+  };
+  const FNAMES = {1:"Mignolo sx",2:"Anulare sx",3:"Medio sx",4:"Indice sx",5:"Indice dx",6:"Medio dx",7:"Anulare dx",8:"Mignolo dx"};
+  const SHIFTED = {":":".",";":",","?":"'","!":"1",'"':"2","(":"8",")":"9","/":"7","=":"0","%":"5"};
+  const keyEls = {};
+  const kb = document.getElementById("kb");
+
+  function buildKeyboard(){
+    ROWS.forEach((r,i)=>{
+      const row = document.createElement("div"); row.className="kbrow";
+      if(i===2){ const sp=document.createElement("div"); sp.style.width="14px"; row.appendChild(sp); }
+      if(i===3){
+        const sh=document.createElement("div"); sh.className="key wide f1"; sh.textContent="⇧"; keyEls["shiftL"]=sh; row.appendChild(sh);
+      }
+      r.forEach(k=>{
+        const d=document.createElement("div"); d.className="key f"+FINGER[k]; d.textContent=k.toUpperCase()==="'"?"'":k.toUpperCase();
+        if("asdfjklò".includes(k) && i===2) d.style.borderBottom="3px solid #7d8bb0";
+        keyEls[k]=d; row.appendChild(d);
+      });
+      if(i===3){
+        const sh=document.createElement("div"); sh.className="key wide f8"; sh.textContent="⇧"; keyEls["shiftR"]=sh; row.appendChild(sh);
+      }
+      kb.appendChild(row);
+    });
+    const sp=document.createElement("div"); sp.className="kbrow";
+    const space=document.createElement("div"); space.className="key space f4"; space.textContent="spazio"; keyEls[" "]=space;
+    sp.appendChild(space); kb.appendChild(sp);
+
+    const lg=document.getElementById("legend");
+    for(let f=1;f<=8;f++){ lg.insertAdjacentHTML("beforeend", `<span><i class="key f${f}" style="min-width:12px;height:12px"></i>${FNAMES[f]}</span>`); }
+  }
+  buildKeyboard();
+
+  let lastHL=[];
+  function highlight(ch){
+    lastHL.forEach(e=>e.classList.remove("hl")); lastHL=[];
+    if(!ch) return;
+    let base=ch, shift=false;
+    if(ch===" "){ base=" "; }
+    else if(SHIFTED[ch]){ base=SHIFTED[ch]; shift=true; }
+    else if(ch!==ch.toLowerCase()){ base=ch.toLowerCase(); shift=true; }
+    const el=keyEls[base];
+    if(el){ el.classList.add("hl"); lastHL.push(el); }
+    if(shift && FINGER[base]){
+      const s = FINGER[base]<=4 ? keyEls["shiftR"] : keyEls["shiftL"];
+      s.classList.add("hl"); lastHL.push(s);
+    }
+  }
+
+  // ---------- Stato ----------
+  const $ = id => document.getElementById(id);
+  const box=$("textbox"), overlay=$("overlay");
+  let spans=[], target="", pos=0;
+  let running=false, startTime=0, endTime=0, tickId=null;
+  let correct=0, errors=0, total=0, curErr=false;
+  let student={nome:"",cognome:"",classe:""};
+  let lastResult=null;
+
+  function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+  function appendText(str){
+    const frag=document.createDocumentFragment();
+    for(const ch of str){
+      const s=document.createElement("span"); s.textContent=ch; spans.push(s); frag.appendChild(s);
+    }
+    target+=str; box.appendChild(frag);
+  }
+  function appendBatch(){ appendText((target? " ":"")+shuffle(PASSAGES).join(" ")); }
+
+  function resetText(){
+    box.querySelectorAll("span").forEach(s=>s.remove());
+    spans=[]; target=""; pos=0;
+    appendBatch();
+  }
+
+  function setCursor(){
+    spans.forEach(s=>s.classList.remove("cur","err"));
+    const s=spans[pos]; if(!s) return;
+    s.classList.add("cur");
+    // scroll
+    box.scrollTop = Math.max(0, s.offsetTop - box.clientHeight/2 + 20);
+    highlight(target[pos]);
+  }
+
+  function fmt(sec){ const m=Math.floor(sec/60), s=Math.floor(sec%60); return m+":"+String(s).padStart(2,"0"); }
+
+  function stats(elapsedSec){
+    const min=Math.max(elapsedSec,1)/60;
+    const wpm=Math.round((correct/5)/min);
+    const acc= total? Math.round(correct/total*100) : 100;
+    return {wpm,acc};
+  }
+
+  function updateUI(){
+    const now=Date.now();
+    const elapsed=Math.min((now-startTime)/1000, DURATION);
+    const left=Math.max(0, DURATION-elapsed);
+    $("timer").textContent=fmt(Math.ceil(left));
+    $("timer").classList.toggle("low", left<=30);
+    $("bar").style.width=(left/DURATION*100)+"%";
+    const st=stats(elapsed);
+    $("wpm").textContent = elapsed>=3 ? st.wpm : 0;
+    $("acc").textContent = st.acc+"%";
+    $("errs").textContent = errors;
+    if(left<=0) finish(false);
+  }
+
+  // ---------- Controlli ----------
+  function validate(){
+    const n=$("nome").value.trim(), c=$("cognome").value.trim(), k=$("classe").value.trim();
+    if(!n||!c||!k){ $("msg").textContent="Compila nome, cognome e classe prima di iniziare."; return null; }
+    $("msg").textContent="";
+    return {nome:n,cognome:c,classe:k};
+  }
+
+  function start(){
+    const s=validate(); if(!s) return;
+    student=s;
+    ["nome","cognome","classe"].forEach(id=>{ $(id).disabled=true; });
+    if(document.activeElement) document.activeElement.blur();
+    resetText();
+    correct=0; errors=0; total=0; pos=0;
+    $("result").style.display="none";
+    overlay.classList.add("hidden");
+    box.classList.add("active");
+    $("btnStart").disabled=true; $("btnStop").disabled=false;
+    running=true; startTime=Date.now();
+    $("wpm").textContent="0"; $("acc").textContent="100%"; $("errs").textContent="0";
+    setCursor();
+    tickId=setInterval(updateUI,200);
+    updateUI();
+  }
+
+  function finish(early){
+    if(!running) return;
+    running=false; clearInterval(tickId);
+    const elapsed=Math.min((Date.now()-startTime)/1000, DURATION);
+    const st=stats(elapsed);
+    lastResult={elapsed:Math.round(elapsed), wpm:st.wpm, acc:st.acc, correct, errors, total, date:new Date()};
+    highlight(null);
+    box.classList.remove("active");
+    overlay.innerHTML = early ? "Esercizio terminato. Guarda il risultato qui sotto." : "⏰ Tempo scaduto! Ottimo lavoro!";
+    overlay.classList.remove("hidden");
+    $("btnStart").disabled=false; $("btnStop").disabled=true;
+    ["nome","cognome","classe"].forEach(id=>{ $(id).disabled=false; });
+    $("timer").textContent=fmt(Math.max(0,Math.ceil(DURATION-elapsed)));
+    showResult();
+  }
+
+  function level(wpm){
+    if(wpm<10) return ["Principiante 🌱","Stai muovendo i primi passi: va benissimo. Concentrati sulla posizione delle dita e sul non guardare la tastiera."];
+    if(wpm<20) return ["In crescita 🌿","Stai migliorando! Continua ad allenarti ogni giorno e tieni un ritmo regolare."];
+    if(wpm<30) return ["Bravo 🌳","Ottimo risultato per la tua età. Prova a ridurre ancora gli errori per diventare più veloce."];
+    return ["Campione ⚡","Velocità eccellente! Mantieni la precisione alta e continua così."];
+  }
+
+  function advice(r){
+    let a=level(r.wpm)[1];
+    if(r.acc<90) a+=" Attenzione agli errori: rallenta un po', la precisione viene prima della velocità.";
+    else if(r.acc>=97) a+=" La tua precisione è eccellente!";
+    return a;
+  }
+
+  function showResult(){
+    const r=lastResult;
+    $("resName").textContent=`${student.cognome} ${student.nome} — classe ${student.classe}`;
+    $("rWpm").textContent=r.wpm; $("rAcc").textContent=r.acc+"%";
+    $("rChars").textContent=r.correct; $("rErr").textContent=r.errors;
+    $("rLevel").textContent=level(r.wpm)[0];
+    $("rAdvice").textContent=advice(r);
+    $("result").style.display="block";
+    $("result").scrollIntoView({behavior:"smooth",block:"start"});
+  }
+
+  function downloadReport(){
+    const r=lastResult; if(!r) return;
+    const d=r.date, p=n=>String(n).padStart(2,"0");
+    const dataStr=`${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+    const lines=[
+      "REPORT ESERCIZIO DI DATTILOGRAFIA",
+      "=================================",
+      "",
+      `Cognome:               ${student.cognome}`,
+      `Nome:                  ${student.nome}`,
+      `Classe:                ${student.classe}`,
+      `Data e ora:            ${dataStr}`,
+      "",
+      "RISULTATI",
+      "---------",
+      `Durata esercizio:      ${fmt(r.elapsed)} (su 5:00 previsti)`,
+      `Velocita':             ${r.wpm} parole al minuto`,
+      `Precisione:            ${r.acc}%`,
+      `Caratteri corretti:    ${r.correct}`,
+      `Errori commessi:       ${r.errors}`,
+      `Tasti premuti (totale): ${r.total}`,
+      `Livello:               ${level(r.wpm)[0].replace(/[^\x20-\x7EàèéìòùÀÈÉÌÒÙ]/g,"").trim()}`,
+      "",
+      "COMMENTO",
+      "--------",
+      advice(r),
+      "",
+      "Nota: 1 parola = 5 caratteri. Gli errori vengono contati ogni volta che si preme un tasto sbagliato."
+    ];
+    const blob=new Blob(["\uFEFF"+lines.join("\r\n")],{type:"text/plain;charset=utf-8"});
+    const clean=s=>s.replace(/[^a-zA-Z0-9]+/g,"_");
+    const name=`report_${clean(student.cognome)}_${clean(student.nome)}_${clean(student.classe)}_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}.txt`;
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob); a.download=name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  }
+
+  // ---------- Tastiera ----------
+  document.addEventListener("keydown",e=>{
+    if(!running) return;
+    if(e.ctrlKey||e.metaKey||e.altKey) return;
+    if(e.key.length!==1) return; // ignora Shift, Invio, frecce...
+    e.preventDefault();
+    total++;
+    const expected=target[pos];
+    if(e.key===expected){
+      correct++;
+      spans[pos].classList.remove("cur","err");
+      spans[pos].classList.add(curErr?"bad":"ok");
+      curErr=false; pos++;
+      if(pos>target.length-300) appendBatch();
+      setCursor();
+    } else {
+      errors++; curErr=true;
+      const s=spans[pos];
+      s.classList.remove("err"); void s.offsetWidth; s.classList.add("err");
+    }
+  });
+
+  $("btnStart").addEventListener("click",start);
+  $("btnStop").addEventListener("click",()=>finish(true));
+  $("btnReport").addEventListener("click",downloadReport);
+  $("btnAgain").addEventListener("click",()=>{ window.scrollTo({top:0,behavior:"smooth"}); start(); });
+  $("chkKb").addEventListener("change",e=>{ kb.style.display=e.target.checked?"":"none"; $("legend").style.display=e.target.checked?"":"none"; });
+
+  // Testo iniziale di anteprima
+  resetText();
+})();
+</script>
+</body>
+</html>
