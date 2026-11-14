@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Impara a scrivere con la tastiera</title>
+<style>
+:root{
+  --bg:#f4f8ff; --card:#ffffff; --ink:#1b2a41; --muted:#4a5a73;
+  --blue:#2563eb; --green:#15803d; --orange:#c2410c; --red:#b91c1c; --yellow:#fde68a;
+  --radius:20px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Verdana","Trebuchet MS",Arial,sans-serif;font-size:20px;line-height:1.6}
+.wrap{max-width:1000px;margin:0 auto;padding:20px}
+h1{font-size:2.1rem;margin:10px 0 4px;text-align:center}
+h2{font-size:1.6rem;margin:0 0 12px}
+.sub{text-align:center;color:var(--muted);margin:0 0 20px}
+.card{background:var(--card);border-radius:var(--radius);padding:22px;margin-bottom:22px;box-shadow:0 3px 12px rgba(30,60,120,.12);border:3px solid #dbe6fb}
+button{font:inherit;font-weight:700;border:none;border-radius:16px;padding:14px 24px;cursor:pointer;color:#fff;background:var(--blue);min-height:56px}
+button:hover{filter:brightness(1.1)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:4px solid #f59e0b;outline-offset:2px}
+button:disabled{background:#9aa7bd;cursor:not-allowed}
+.btn-green{background:var(--green)} .btn-orange{background:var(--orange)} .btn-gray{background:#475569}
+.btn-small{padding:8px 14px;min-height:42px;font-size:.9rem;background:#475569}
+
+/* Passi */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}
+.step{background:#f8fbff;border:3px solid #cfe0ff;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.step .num{width:44px;height:44px;border-radius:50%;background:var(--blue);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.step .emoji{font-size:2.4rem;line-height:1}
+.step h3{margin:0;font-size:1.25rem}
+.step p{margin:0}
+
+/* Tastiera */
+.kb{display:flex;flex-direction:column;align-items:center;gap:6px;margin:14px 0;user-select:none}
+.row{display:flex;gap:6px}
+.key{width:clamp(26px,7vw,56px);height:clamp(34px,8vw,56px);border-radius:10px;border:2px solid #334155;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(.8rem,2.4vw,1.2rem);text-transform:uppercase;color:#111;position:relative}
+.key.space{width:clamp(150px,40vw,340px)}
+.key.home::after{content:"";position:absolute;bottom:5px;width:40%;height:3px;background:#111;border-radius:2px}
+.key.next{outline:5px solid #111;transform:translateY(-3px);box-shadow:0 6px 0 rgba(0,0,0,.35);animation:pulse 1s infinite}
+.key.pressed{transform:scale(.9);filter:brightness(.8)}
+@keyframes pulse{50%{outline-color:#f59e0b}}
+.f-mignolo{background:#fbcfe8}.f-anulare{background:#fed7aa}.f-medio{background:#fef08a}.f-indice{background:#bbf7d0}.f-indice2{background:#a5f3fc}.f-pollice{background:#ddd6fe}
+.legend{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;font-size:.9rem}
+.legend span{padding:4px 12px;border-radius:12px;border:2px solid #334155;font-weight:700}
+.hint{background:#fff7d6;border:3px dashed #d97706;border-radius:16px;padding:12px 16px;text-align:center;font-weight:700;min-height:60px}
+
+/* Esercizio */
+.top{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.top{grid-template-columns:1fr}}
+label{font-weight:700;display:block;margin-bottom:4px}
+input[type=text],select{font:inherit;width:100%;padding:12px 14px;border:3px solid #94a3b8;border-radius:14px;background:#fff;color:var(--ink)}
+.timerbox{text-align:center}
+.time{font-size:4.2rem;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:2px;line-height:1.1}
+.time.low{color:var(--red)}
+.bar{height:22px;background:#e2e8f0;border-radius:12px;overflow:hidden;margin:10px 0 14px;border:2px solid #94a3b8}
+.bar div{height:100%;width:100%;background:var(--green);transition:width .5s linear}
+.controls{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.model{background:#f1f5f9;border:3px solid #94a3b8;border-radius:16px;padding:16px;font-size:1.7rem;line-height:2;font-family:"Courier New",monospace;word-break:break-word;margin:14px 0;max-height:210px;overflow:auto}
+.model .ok{color:var(--green);font-weight:800}
+.model .bad{background:#fecaca;color:var(--red);font-weight:800;border-radius:4px}
+.model .cur{background:var(--yellow);border-bottom:4px solid #111}
+textarea{font:inherit;font-size:1.6rem;font-family:"Courier New",monospace;width:100%;min-height:150px;padding:14px;border:4px solid var(--blue);border-radius:16px;background:#fff;color:var(--ink);resize:vertical}
+textarea:disabled{background:#e5e7eb;border-color:#9aa7bd}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:14px}
+.stat{background:#eef4ff;border-radius:16px;padding:10px;text-align:center;border:2px solid #cfe0ff}
+.stat b{display:block;font-size:2rem}
+.stat span{font-size:.85rem;color:var(--muted)}
+.msg{margin-top:14px;padding:14px 18px;border-radius:16px;font-weight:700;text-align:center;display:none}
+.msg.show{display:block}
+.msg.warn{background:#fee2e2;color:var(--red);border:3px solid var(--red)}
+.msg.good{background:#dcfce7;color:var(--green);border:3px solid var(--green);font-size:1.3rem}
+.report-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+pre#preview{background:#f8fafc;border:3px solid #cbd5e1;border-radius:16px;padding:16px;white-space:pre-wrap;word-break:break-word;font-size:1rem;margin:12px 0 0;max-height:300px;overflow:auto}
+@media print{ body{background:#fff} .card:not(#reportCard){display:none} #reportCard .report-actions{display:none} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>⌨️ Scrivo con la tastiera</h1>
+  <p class="sub">Piano piano, passo dopo passo. L'importante è fare con calma!</p>
+
+  <!-- ISTRUZIONI -->
+  <section class="card" aria-labelledby="h-come">
+    <h2 id="h-come">📖 Come si scrive più veloce: 6 passi semplici</h2>
+    <div class="steps">
+      <article class="step">
+        <div class="num">1</div><div class="emoji">🪑</div>
+        <h3>Siediti bene</h3>
+        <p>Schiena dritta. Piedi a terra. Le braccia stanno comode davanti alla tastiera.</p>
+        <button class="btn-small" data-say="Passo uno. Siediti bene. Schiena dritta. Piedi a terra. Le braccia stanno comode davanti alla tastiera.">🔊 Ascolta</button>
+      </article>
+      <article class="step">
+        <div class="num">2</div><div class="emoji">🖐️</div>
+        <h3>Dita sulla riga di casa</h3>
+        <p>Mano sinistra su <b>A S D F</b>. Mano destra su <b>J K L Ò</b>. Gli indici stanno sui tasti <b>F</b> e <b>J</b>: senti la lineetta piccola!</p>
+        <button class="btn-small" data-say="Passo due. Metti le dita sulla riga di casa. La mano sinistra su A, S, D, F. La mano destra su J, K, L, O con l'accento. Gli indici stanno sui tasti F e J. Senti la lineetta piccola.">🔊 Ascolta</button>
+      </article>
+      <article class="step">
+        <div class="num">3</div><div class="emoji">👍</div>
+        <h3>I pollici sullo spazio</h3>
+        <p>Il pollice preme la barra lunga. Si usa per lasciare lo spazio tra una parola e l'altra.</p>
+        <button class="btn-small" data-say="Passo tre. I pollici stanno sulla barra lunga. Si usa per fare lo spazio tra una parola e l'altra.">🔊 Ascolta</button>
+      </article>
+      <article class="step">
+        <div class="num">4</div><div class="emoji">👀</div>
+        <h3>Guarda lo schermo</h3>
+        <p>Non guardare i tasti. Guarda le lettere sullo schermo. Le dita imparano la strada da sole.</p>
+        <button class="btn-small" data-say="Passo quattro. Guarda lo schermo, non guardare i tasti. Le dita imparano la strada da sole.">🔊 Ascolta</button>
+      </article>
+      <article class="step">
+        <div class="num">5</div><div class="emoji">🐢</div>
+        <h3>Prima giusto, poi veloce</h3>
+        <p>Vai piano e scrivi bene. Se sbagli, premi <b>Cancella</b> (la freccia ←) e riprova. La velocità arriva dopo.</p>
+        <button class="btn-small" data-say="Passo cinque. Prima scrivi giusto, poi più veloce. Vai piano. Se sbagli, premi il tasto cancella e riprova. La velocità arriva dopo.">🔊 Ascolta</button>
+      </article>
+      <article class="step">
+        <div class="num">6</div><div class="emoji">🌈</div>
+        <h3>Ogni dito, il suo tasto</h3>
+        <p>Ogni dito ha il suo colore sulla tastiera qui sotto. Usa sempre il dito giusto, anche se all'inizio è lento.</p>
+        <button class="btn-small" data-say="Passo sei. Ogni dito ha il suo tasto. Guarda i colori sulla tastiera qui sotto e usa sempre il dito giusto.">🔊 Ascolta</button>
+      </article>
+    </div>
+  </section>
+
+  <!-- TASTIERA -->
+  <section class="card" aria-labelledby="h-kb">
+    <h2 id="h-kb">🎨 La tastiera a colori</h2>
+    <div class="legend" aria-hidden="true">
+      <span class="f-mignolo">Mignolo</span><span class="f-anulare">Anulare</span><span class="f-medio">Medio</span>
+      <span class="f-indice">Indice sinistro</span><span class="f-indice2">Indice destro</span><span class="f-pollice">Pollice</span>
+    </div>
+    <div class="kb" id="kb" aria-hidden="true"></div>
+    <div class="hint" id="hint">Premi “Inizia” per cominciare: ti dirò quale dito usare!</div>
+  </section>
+
+  <!-- ESERCIZIO -->
+  <section class="card" aria-labelledby="h-es">
+    <h2 id="h-es">✍️ Facciamo pratica (10 minuti)</h2>
+    <div class="top">
+      <div>
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" autocomplete="off" placeholder="Scrivi qui il tuo nome">
+        <div style="height:12px"></div>
+        <label for="cognome">Cognome</label>
+        <input type="text" id="cognome" autocomplete="off" placeholder="Scrivi qui il tuo cognome">
+        <div style="height:12px"></div>
+        <label for="livello">Scegli l'esercizio</label>
+        <select id="livello">
+          <option value="1">Facile: solo la riga di casa</option>
+          <option value="2">Medio: parole semplici</option>
+          <option value="3">Più lungo: frasi</option>
+        </select>
+      </div>
+      <div class="timerbox">
+        <div class="time" id="time" role="timer" aria-live="off">10:00</div>
+        <div class="bar" aria-hidden="true"><div id="barFill"></div></div>
+        <div class="controls">
+          <button class="btn-green" id="btnStart">▶ Inizia</button>
+          <button class="btn-orange" id="btnPause" disabled>⏸ Pausa</button>
+          <button class="btn-gray" id="btnReset">↺ Ricomincia</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="msg warn" id="warn" role="alert"></div>
+
+    <p style="margin:18px 0 0;font-weight:700">1) Leggi questo testo:</p>
+    <div class="model" id="model" aria-label="Testo da copiare"></div>
+    <label for="typing">2) Scrivilo qui sotto:</label>
+    <textarea id="typing" disabled spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="Premi “Inizia”, poi scrivi qui…"></textarea>
+
+    <div class="stats" aria-live="polite">
+      <div class="stat"><b id="sChars">0</b><span>caratteri</span></div>
+      <div class="stat"><b id="sWords">0</b><span>parole</span></div>
+      <div class="stat"><b id="sAcc">100%</b><span>precisione</span></div>
+      <div class="stat"><b id="sWpm">0</b><span>parole al minuto</span></div>
+    </div>
+    <div class="msg good" id="done" role="status"></div>
+  </section>
+
+  <!-- REPORT -->
+  <section class="card" id="reportCard" aria-labelledby="h-rep">
+    <h2 id="h-rep">📄 Il mio report</h2>
+    <p style="margin-top:0">Quando hai finito, premi il pulsante per salvare il report sul computer.</p>
+    <div class="report-actions">
+      <button class="btn-green" id="btnDownload">💾 Scarica e salva il report</button>
+      <button class="btn-gray" id="btnPreview">👁 Guarda il report</button>
+      <button class="btn-gray" id="btnPrint">🖨 Stampa</button>
+    </div>
+    <pre id="preview" hidden></pre>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const TOTAL = 10*60*1000;
+  const TEXTS = {
+    1:"sala dalla falsa salsa alga gaffa flash dada ghigla lago gas fa sa ala hall alfa gala",
+    2:"oggi scrivo con calma. la mia casa e bella. il gatto dorme sul divano. mangio una mela rossa. mi piace il sole. ",
+    3:"Mi piace scrivere al computer. Guardo lo schermo e uso tutte le dita. Vado piano e faccio meno errori. Ogni giorno divento piu brava. "
+  };
+  const NOMI_LIVELLO = {1:"Facile (riga di casa)",2:"Medio (parole semplici)",3:"Frasi"};
+  const $ = id => document.getElementById(id);
+
+  /* --- Tastiera --- */
+  const rows = ["qwertyuiop","asdfghjkl\u00f2","zxcvbnm,."];
+  const fingerOf = {
+    q:"mignolo",a:"mignolo",z:"mignolo",
+    w:"anulare",s:"anulare",x:"anulare",
+    e:"medio",d:"medio",c:"medio",
+    r:"indice",t:"indice",f:"indice",g:"indice",v:"indice",b:"indice",
+    y:"indice2",u:"indice2",h:"indice2",j:"indice2",n:"indice2",m:"indice2",
+    i:"medio2",k:"medio2",",":"medio2",
+    o:"anulare2",l:"anulare2",".":"anulare2",
+    p:"mignolo2","\u00f2":"mignolo2"," ":"pollice"
+  };
+  const fingerName = {
+    mignolo:"mignolo sinistro",anulare:"anulare sinistro",medio:"medio sinistro",indice:"indice sinistro",
+    indice2:"indice destro",medio2:"medio destro",anulare2:"anulare destro",mignolo2:"mignolo destro",pollice:"pollice"
+  };
+  const colorClass = f => ({mignolo:"f-mignolo",mignolo2:"f-mignolo",anulare:"f-anulare",anulare2:"f-anulare",medio:"f-medio",medio2:"f-medio",indice:"f-indice",indice2:"f-indice2",pollice:"f-pollice"})[f];
+  const keyEls = {};
+  const kb = $("kb");
+  rows.forEach((r,i)=>{
+    const d = document.createElement("div"); d.className="row"; d.style.marginLeft=(i*14)+"px";
+    [...r].forEach(ch=>{
+      const k=document.createElement("div");
+      k.className="key "+colorClass(fingerOf[ch])+("fj".includes(ch)?" home":"");
+      k.textContent=ch; keyEls[ch]=k; d.appendChild(k);
+    });
+    kb.appendChild(d);
+  });
+  const sp=document.createElement("div"); sp.className="key space f-pollice"; sp.textContent="spazio"; keyEls[" "]=sp;
+  const rowSp=document.createElement("div"); rowSp.className="row"; rowSp.appendChild(sp); kb.appendChild(rowSp);
+
+  /* --- Stato --- */
+  let model="", elapsed=0, startTs=0, running=false, finished=false, started=false, tick=null;
+  let keys=0, wrong=0;
+
+  const typing=$("typing"), modelEl=$("model");
+
+  function buildModel(){
+    const base=TEXTS[$("livello").value];
+    model = base;
+    while(model.length < 800) model += (base.endsWith(" ")?"":" ") + base;
+  }
+  function currentElapsed(){ return elapsed + (running ? Date.now()-startTs : 0); }
+  function fmt(ms){ const s=Math.max(0,Math.ceil(ms/1000)); return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"); }
+
+  function renderModel(){
+    const t=typing.value; let html="";
+    const show=Math.min(model.length, Math.max(t.length+120, 160));
+    for(let i=0;i<show;i++){
+      let c=model[i]; const vis = c===" " ? "&nbsp;" : c.replace(/&/g,"&amp;").replace(/</g,"&lt;");
+      if(i<t.length) html+= `<span class="${t[i]===c?"ok":"bad"}">${vis}</span>`;
+      else if(i===t.length) html+= `<span class="cur">${vis}</span>`;
+      else html+=vis;
+    }
+    modelEl.innerHTML=html;
+    const cur=modelEl.querySelector(".cur"); if(cur) cur.scrollIntoView({block:"nearest"});
+    highlightNext();
+  }
+  function highlightNext(){
+    Object.values(keyEls).forEach(k=>k.classList.remove("next"));
+    if(!started || finished){ return; }
+    const ch=model[typing.value.length]; if(!ch) return;
+    const low=ch.toLowerCase(); const k=keyEls[low];
+    if(k){
+      k.classList.add("next");
+      const cap = ch!==low ? " (con Maiuscolo: tieni premuto il tasto freccia in su ⇧)" : "";
+      $("hint").innerHTML = ch===" "
+        ? "Premi la <b>barra spaziatrice</b> con il <b>pollice</b> 👍"
+        : `Premi la lettera <b>${ch.toUpperCase()}</b> con il <b>${fingerName[fingerOf[low]]}</b>${cap}`;
+    } else {
+      $("hint").textContent = "Premi il tasto: " + ch;
+    }
+  }
+
+  function stats(){
+    const t=typing.value; let ok=0;
+    for(let i=0;i<t.length;i++) if(t[i]===model[i]) ok++;
+    const words = t.trim()? t.trim().split(/\s+/).length : 0;
+    const mins = Math.max(currentElapsed(),1000)/60000;
+    const wpm = Math.round((ok/5)/mins*10)/10;
+    const acc = keys? Math.round((keys-wrong)/keys*100) : 100;
+    return {chars:t.length, ok, words, wpm, acc, errNow:t.length-ok, errTot:wrong, keys};
+  }
+  function updateStats(){
+    const s=stats();
+    $("sChars").textContent=s.chars; $("sWords").textContent=s.words;
+    $("sAcc").textContent=s.acc+"%"; $("sWpm").textContent=String(s.wpm).replace(".",",");
+  }
+  function updateTimer(){
+    const left=TOTAL-currentElapsed();
+    $("time").textContent=fmt(left);
+    $("time").classList.toggle("low", left<=60000);
+    $("barFill").style.width=Math.max(0,left/TOTAL*100)+"%";
+    updateStats();
+    if(left<=0) finish();
+  }
+  function showWarn(t){ const w=$("warn"); w.textContent=t; w.classList.toggle("show",!!t); }
+
+  function start(){
+    if(finished) return;
+    if(!$("nome").value.trim() || !$("cognome").value.trim()){
+      showWarn("✋ Prima scrivi il tuo nome e il tuo cognome nelle caselle.");
+      ($("nome").value.trim()? $("cognome"):$("nome")).focus(); return;
+    }
+    showWarn("");
+    $("livello").disabled=true; $("nome").disabled=$("cognome").disabled=true;
+    started=true; running=true; startTs=Date.now();
+    typing.disabled=false; typing.focus();
+    $("btnStart").disabled=true; $("btnPause").disabled=false;
+    $("btnPause").textContent="⏸ Pausa";
+    clearInterval(tick); tick=setInterval(updateTimer,250);
+    renderModel();
+  }
+  function pause(){
+    if(!started||finished) return;
+    if(running){
+      elapsed+=Date.now()-startTs; running=false; typing.disabled=true;
+      $("btnPause").textContent="▶ Continua"; $("hint").textContent="⏸ Sei in pausa. Premi “Continua” quando sei pronta.";
+      Object.values(keyEls).forEach(k=>k.classList.remove("next"));
+    } else {
+      running=true; startTs=Date.now(); typing.disabled=false; typing.focus();
+      $("btnPause").textContent="⏸ Pausa"; renderModel();
+    }
+  }
+  function beep(){
+    try{
+      const ac=new (window.AudioContext||window.webkitAudioContext)();
+      [660,880,1100].forEach((f,i)=>{
+        const o=ac.createOscillator(), g=ac.createGain(); o.frequency.value=f; o.connect(g); g.connect(ac.destination);
+        g.gain.setValueAtTime(.15,ac.currentTime+i*.25); g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+i*.25+.22);
+        o.start(ac.currentTime+i*.25); o.stop(ac.currentTime+i*.25+.25);
+      });
+    }catch(e){}
+  }
+  function finish(){
+    if(finished) return;
+    if(running){ elapsed+=Date.now()-startTs; running=false; }
+    elapsed=Math.min(elapsed,TOTAL);
+    finished=true; clearInterval(tick);
+    typing.disabled=true; $("btnStart").disabled=true; $("btnPause").disabled=true;
+    $("time").textContent=fmt(TOTAL-elapsed); $("barFill").style.width=Math.max(0,(TOTAL-elapsed)/TOTAL*100)+"%";
+    updateStats(); highlightNext();
+    const s=stats(); const d=$("done");
+    d.textContent="🎉 Tempo finito! Bravissima, hai scritto "+s.words+" parole. Ora premi “Scarica e salva il report”.";
+    d.classList.add("show"); $("hint").textContent="🎉 Hai finito! Bravissima!";
+    beep();
+    d.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+  function resetAll(){
+    if(started && !finished && !confirm("Vuoi davvero ricominciare da capo? Il lavoro fatto sarà cancellato.")) return;
+    clearInterval(tick); running=false; finished=false; started=false; elapsed=0; keys=0; wrong=0;
+    typing.value=""; typing.disabled=true;
+    $("livello").disabled=false; $("nome").disabled=$("cognome").disabled=false;
+    $("btnStart").disabled=false; $("btnPause").disabled=true; $("btnPause").textContent="⏸ Pausa";
+    $("time").textContent="10:00"; $("time").classList.remove("low"); $("barFill").style.width="100%";
+    $("done").classList.remove("show"); showWarn(""); $("preview").hidden=true;
+    $("hint").textContent="Premi “Inizia” per cominciare: ti dirò quale dito usare!";
+    buildModel(); renderModel(); updateStats();
+  }
+
+  /* --- Eventi digitazione --- */
+  typing.addEventListener("input",e=>{
+    if(!running) return;
+    if(e.inputType==="insertText" && e.data){
+      const idx=typing.value.length-1; keys++;
+      if(model[idx]!==e.data) wrong++;
+    }
+    renderModel(); updateStats();
+  });
+  typing.addEventListener("paste",e=>e.preventDefault());
+  typing.addEventListener("drop",e=>e.preventDefault());
+  document.addEventListener("keydown",e=>{
+    const k=keyEls[e.key.toLowerCase()]; if(k){ k.classList.add("pressed"); setTimeout(()=>k.classList.remove("pressed"),130); }
+  });
+
+  /* --- Report --- */
+  function buildReport(){
+    const s=stats(); const nome=$("nome").value.trim(), cognome=$("cognome").value.trim();
+    const now=new Date();
+    const data=now.toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long",year:"numeric"})+" alle "+now.toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"});
+    const sec=Math.round(Math.min(currentElapsed(),TOTAL)/1000);
+    const durata=String(Math.floor(sec/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0");
+    return [
+      "REPORT DI DIGITAZIONE",
+      "=====================",
+      "Alunna: "+(nome||"-")+" "+(cognome||""),
+      "Data: "+data,
+      "Esercizio: "+NOMI_LIVELLO[$("livello").value],
+      "Tempo disponibile: 10:00",
+      "Tempo usato: "+durata+(finished?" (esercizio completato)":" (esercizio non terminato)"),
+      "",
+      "RISULTATI",
+      "---------",
+      "Caratteri scritti: "+s.chars,
+      "Caratteri corretti: "+s.ok,
+      "Parole scritte: "+s.words,
+      "Errori fatti mentre scriveva: "+s.errTot,
+      "Errori rimasti nel testo: "+s.errNow,
+      "Precisione: "+s.acc+"%",
+      "Velocità: "+String(s.wpm).replace(".",",")+" parole al minuto",
+      "",
+      "TESTO SCRITTO",
+      "-------------",
+      typing.value||"(nessun testo)",
+      ""
+    ].join("\n");
+  }
+  function slug(t){ return t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9]+/g,"_").replace(/^_|_$/g,""); }
+  function download(){
+    if(!$("nome").value.trim()||!$("cognome").value.trim()){
+      showWarn("✋ Scrivi nome e cognome per salvare il report."); $("nome").disabled=false; $("cognome").disabled=false; $("nome").focus(); $("nome").scrollIntoView({block:"center"}); return;
+    }
+    showWarn("");
+    const txt="\uFEFF"+buildReport();
+    const blob=new Blob([txt],{type:"text/plain;charset=utf-8"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="Report_"+slug($("cognome").value)+"_"+slug($("nome").value)+".txt";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    $("preview").textContent=buildReport(); $("preview").hidden=false;
+  }
+
+  /* --- Audio guida --- */
+  document.querySelectorAll("[data-say]").forEach(b=>b.addEventListener("click",()=>{
+    if(!("speechSynthesis" in window)){ alert("Il tuo browser non può leggere ad alta voce."); return; }
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(b.dataset.say); u.lang="it-IT"; u.rate=.85; speechSynthesis.speak(u);
+  }));
+
+  $("btnStart").addEventListener("click",start);
+  $("btnPause").addEventListener("click",pause);
+  $("btnReset").addEventListener("click",resetAll);
+  $("btnDownload").addEventListener("click",download);
+  $("btnPreview").addEventListener("click",()=>{ $("preview").textContent=buildReport(); $("preview").hidden=!$("preview").hidden; });
+  $("btnPrint").addEventListener("click",()=>{ $("preview").textContent=buildReport(); $("preview").hidden=false; window.print(); });
+  $("livello").addEventListener("change",()=>{ buildModel(); renderModel(); });
+
+  buildModel(); renderModel(); updateStats();
+})();
+</script>
+</body>
+</html>
