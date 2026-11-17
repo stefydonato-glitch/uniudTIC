@@ -1,0 +1,21 @@
+﻿REPORT DI DIGITAZIONE
+=====================
+Alunna: stefania donato
+Data: domenica 15 novembre 2026 alle 10:08
+Esercizio: Medio (parole semplici)
+Tempo disponibile: 10:00
+Tempo usato: 02:55 (esercizio non terminato)
+
+RISULTATI
+---------
+Caratteri scritti: 132
+Caratteri corretti: 23
+Parole scritte: 24
+Errori fatti mentre scriveva: 120
+Errori rimasti nel testo: 109
+Precisione: 22%
+Velocità: 1,6 parole al minuto
+
+TESTO SCRITTO
+-------------
+oggi scrivo con calma.la mia casa è bella.il gatto dorme sul divano. mangio una mela rossa. mi piace il sole. oggi scrivo con calma.
